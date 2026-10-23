@@ -1,0 +1,66 @@
+version: 2
+
+models:
+  - name: mart_orders
+    description: "Final orders mart with basket metrics and reorder rate"
+    columns:
+      - name: order_id
+        description: "Primary key for orders"
+        data_tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: "Foreign key to customers"
+        data_tests:
+          - not_null
+      - name: basket_size
+        description: "Number of items in the order"
+        data_tests:
+          - not_null:
+              config:
+                severity: warn
+
+      - name: reorder_rate_pct
+        description: "Percentage of items that were reordered"
+        data_tests:
+          - not_null:
+              config:
+                severity: warn
+
+  - name: mart_products
+    description: "Product performance metrics"
+    columns:
+      - name: product_id
+        description: "Primary key for products"
+        data_tests:
+          - unique
+          - not_null
+      - name: product_name
+        description: "Name of the product"
+        data_tests:
+          - not_null
+      - name: total_orders
+        description: "Total number of times product was ordered"
+        data_tests:
+          - not_null
+
+  - name: mart_customers
+    description: "Customer behaviour metrics and segmentation"
+    columns:
+      - name: user_id
+        description: "Primary key for customers"
+        data_tests:
+          - unique
+          - not_null
+      - name: total_orders
+        description: "Total number of orders by customer"
+        data_tests:
+          - not_null
+      - name: customer_segment
+        description: "Customer segment based on order frequency"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['one_time', 'occasional', 'regular', 'loyal']
+                quote: true

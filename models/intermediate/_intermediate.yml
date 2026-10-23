@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: int_order_products_enriched
+    description: "Order products enriched with product, aisle and department information"
+    columns:
+      - name: order_id
+        description: "Foreign key to orders"
+      - name: product_id
+        description: "Foreign key to products"
+      - name: add_to_cart_order
+        description: "Order in which product was added to cart"
+      - name: reordered
+        description: "1 if product has been ordered before, 0 if not"
+      - name: order_set
+        description: "Whether order is from prior or train dataset"
+      - name: product_name
+        description: "Name of the product"
+      - name: aisle
+        description: "Aisle where product is located"
+      - name: department
+        description: "Department where product is located"
+
+  - name: int_orders_enriched
+    description: "Orders enriched with basket metrics and reorder statistics"
+    columns:
+      - name: order_id
+        description: "Primary key for orders"
+      - name: user_id
+        description: "Foreign key to customers"
+      - name: order_number
+        description: "Sequence number of order for this customer"
+      - name: order_day_of_week
+        description: "Day of week order was placed (0=Saturday, 6=Friday)"
+      - name: order_hour_of_day
+        description: "Hour of day order was placed"
+      - name: days_since_prior_order
+        description: "Days since customer's previous order, NULL for first orders"
+      - name: basket_size
+        description: "Total number of items in the order"
+      - name: reordered_items
+        description: "Number of items that were reordered"
+      - name: new_items
+        description: "Number of items ordered for the first time"
+      - name: is_first_order
+        description: "True if this is the customer's first order"

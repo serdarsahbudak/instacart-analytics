@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: "Cleaned orders data from raw source"
+    columns:
+      - name: order_id
+        description: "Primary key for orders"
+        data_tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: "Foreign key to customers"
+        data_tests:
+          - not_null
+      - name: order_day_of_week
+        description: "Day of week order was placed (0=Saturday, 6=Friday)"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1, 2, 3, 4, 5, 6]
+                quote: false
+
+  - name: stg_products
+    description: "Cleaned products data from raw source"
+    columns:
+      - name: product_id
+        description: "Primary key for products"
+        data_tests:
+          - unique
+          - not_null
+      - name: product_name
+        description: "Name of the product"
+        data_tests:
+          - not_null
+
+  - name: stg_order_products
+    description: "Combined prior and train order products"
+    columns:
+      - name: order_id
+        description: "Foreign key to orders"
+        data_tests:
+          - not_null
+      - name: product_id
+        description: "Foreign key to products"
+        data_tests:
+          - not_null
+      - name: order_set
+        description: "Whether order is from prior or train set"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["prior", "train"]

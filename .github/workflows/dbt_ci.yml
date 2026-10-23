@@ -1,0 +1,47 @@
+name: dbt CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  dbt-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt
+        run: pip install dbt-bigquery
+
+      - name: Set up BigQuery credentials
+        run: |
+          echo '${{ secrets.BIGQUERY_CREDENTIALS }}' > credentials.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=credentials.json" >> $GITHUB_ENV
+
+      - name: Set up dbt profiles
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << EOF
+          instacart_analytics:
+            target: dev
+            outputs:
+              dev:
+                type: bigquery
+                method: service-account
+                project: instacart-analytics-512220
+                dataset: dbt_ci
+                location: europe-west2
+                keyfile: credentials.json
+                threads: 4
+          EOF
+
+      - name: Run dbt build
+        run: dbt build --project-dir . --profiles-dir ~/.dbt

@@ -30,7 +30,7 @@ jobs:
         run: |
           mkdir -p ~/.dbt
           cat > ~/.dbt/profiles.yml << EOF
-          instacart_analytics:
+          default:
             target: dev
             outputs:
               dev:

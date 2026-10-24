@@ -1,0 +1,59 @@
+semantic_models:
+  - name: orders
+    description: "Orders semantic model"
+    model: ref('mart_orders')
+    
+    entities:
+      - name: order_id
+        type: primary
+        expr: order_id
+      - name: user_id
+        type: foreign
+        expr: user_id
+
+    dimensions:
+      - name: order_day_of_week
+        type: categorical
+        expr: order_day_of_week
+      - name: is_first_order
+        type: categorical
+        expr: is_first_order
+
+    measures:
+      - name: order_count
+        description: "Total number of orders"
+        agg: count
+        expr: order_id
+      - name: avg_basket_size
+        description: "Average number of items per order"
+        agg: average
+        expr: basket_size
+      - name: avg_reorder_rate
+        description: "Average reorder rate"
+        agg: average
+        expr: reorder_rate_pct
+
+metrics:
+  - name: order_count
+    description: "Total number of orders"
+    type: simple
+    type_params:
+      measure:
+        name: order_count
+        fill_nulls_with: 0
+
+  - name: avg_basket_size
+    description: "Average basket size per order"
+    type: simple
+    type_params:
+      measure:
+        name: avg_basket_size
+        fill_nulls_with: 0
+
+  - name: avg_reorder_rate
+    description: "Average reorder rate percentage"
+    type: simple
+    type_params:
+      measure:
+        name: avg_reorder_rate
+        fill_nulls_with: 0

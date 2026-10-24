@@ -3,29 +3,56 @@ version: 2
 models:
   - name: mart_orders
     description: "Final orders mart with basket metrics and reorder rate"
+    semantic_model:
+      enabled: true
+    agg_time_dimension: order_date
     columns:
+      - name: order_date
+        description: "Approximate order date derived from order sequence"
+        granularity: day
+        dimension:
+          type: time
       - name: order_id
         description: "Primary key for orders"
         data_tests:
           - unique
           - not_null
+        entity:
+          type: primary
       - name: user_id
         description: "Foreign key to customers"
         data_tests:
           - not_null
+        entity:
+          type: foreign
       - name: basket_size
         description: "Number of items in the order"
         data_tests:
           - not_null:
               config:
                 severity: warn
-
       - name: reorder_rate_pct
-        description: "Percentage of items that were reordered"
+        description: "Percentage of items reordered"
         data_tests:
           - not_null:
               config:
                 severity: warn
+    metrics:
+      - name: order_count
+        description: "Total number of orders"
+        type: simple
+        agg: count
+        expr: order_id
+      - name: avg_basket_size
+        description: "Average basket size per order"
+        type: simple
+        agg: average
+        expr: basket_size
+      - name: avg_reorder_rate
+        description: "Average reorder rate percentage"
+        type: simple
+        agg: average
+        expr: reorder_rate_pct
 
   - name: mart_products
     description: "Product performance metrics"

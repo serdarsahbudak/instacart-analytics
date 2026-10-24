@@ -7,6 +7,7 @@ final as (
         order_id,
         user_id,
         order_number,
+        date_add(date '2023-01-01', interval order_number day) as order_date,
         order_day_of_week,
         order_hour_of_day,
         days_since_prior_order,

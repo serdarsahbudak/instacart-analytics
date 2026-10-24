@@ -3,31 +3,28 @@
 An end-to-end ELT pipeline built with Python, BigQuery and dbt, analysing 3.4 million grocery orders from the [Instacart Market Basket Analysis](https://www.kaggle.com/datasets/psparks/instacart-market-basket-analysis) dataset.
 
 ## Architecture
-Raw CSV Files (Kaggle)
-│
-▼
-Python (extract_load.py)
-│
-▼
-BigQuery — raw_instacart dataset
-│
-▼
-dbt Staging Layer (views)
-stg_orders, stg_products, stg_aisles,
-stg_departments, stg_order_products
-│
-▼
-dbt Intermediate Layer (views)
-int_orders_enriched, int_order_products_enriched
-│
-▼
-dbt Marts Layer (tables)
-mart_orders, mart_products, mart_customers
-│
-▼
-dbt Semantic Layer (MetricFlow)
-order_count, avg_basket_size, avg_reorder_rate
 
+```text
+Raw CSV Files (Kaggle)
+        │
+        ▼
+Python (extract_load.py)
+        │
+        ▼
+BigQuery — raw_instacart dataset
+        │
+        ▼
+dbt Staging Layer (views)
+        │
+        ▼
+dbt Intermediate Layer (views)
+        │
+        ▼
+dbt Marts Layer (tables)
+        │
+        ▼
+dbt Semantic Layer (MetricFlow)
+```
 ## Dataset
 
 | Table | Rows |
@@ -40,17 +37,20 @@ order_count, avg_basket_size, avg_reorder_rate
 | departments | 21 |
 
 ## Project Structure
+
+```text
 instacart-analytics/
 ├── python/
-│ └── extract_load.py # Loads raw CSVs into BigQuery
+│   └── extract_load.py
 ├── models/
-│ ├── staging/ # Cleans and renames raw source tables
-│ ├── intermediate/ # Joins and enriches staging models
-│ └── marts/ # Final analytical tables and semantic layer
+│   ├── staging/
+│   ├── intermediate/
+│   └── marts/
 ├── .github/
-│ └── workflows/
-│ └── dbt_ci.yml # GitHub Actions CI pipeline
+│   └── workflows/
+│       └── dbt_ci.yml
 └── dbt_project.yml
+```
 
 ## Models
 

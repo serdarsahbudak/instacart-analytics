@@ -176,3 +176,56 @@ are consistent across all consumers.
 - **dbt Cloud** — data transformation, testing and documentation
 - **MetricFlow** — semantic layer and metric definitions
 - **GitHub Actions** — CI/CD pipeline
+
+## Setup
+
+### Prerequisites
+- Python 3.9+
+- Google Cloud account with BigQuery enabled
+- dbt Cloud account (free Developer plan)
+- Kaggle account
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/sesssass/instacart-analytics.git
+cd instacart-analytics
+```
+
+### 2. Set up Python environment
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install kaggle google-cloud-bigquery pandas pyarrow
+```
+
+### 3. Configure Kaggle API
+```bash
+mkdir -p ~/.kaggle
+echo '{"username":"YOUR_KAGGLE_USERNAME","key":"YOUR_KAGGLE_KEY"}' > ~/.kaggle/kaggle.json
+chmod 600 ~/.kaggle/kaggle.json
+```
+
+### 4. Configure Google Cloud credentials
+Create a service account in Google Cloud Console with BigQuery Admin role,
+download the JSON key and set the environment variable:
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS="path/to/credentials.json"
+```
+
+### 5. Download and load data
+```bash
+kaggle datasets download -d psparks/instacart-market-basket-analysis --unzip -p ./data/raw
+python3 extract_load.py
+```
+
+### 6. Run dbt
+Connect dbt Cloud to your BigQuery project and GitHub repository, then:
+```bash
+dbt build          # run all models and tests
+dbt sl list metrics  # verify semantic layer
+dbt sl query --metrics order_count  # query a metric
+```
+
+### CI/CD
+GitHub Actions automatically runs `dbt build` on every pull request to main.
+Add your BigQuery service account JSON as a repository secret named `BIGQUERY_CREDENTIALS`.

@@ -25,6 +25,8 @@ dbt Marts Layer (tables)
         ▼
 dbt Semantic Layer (MetricFlow)
 ```
+<img width="2670" height="1240" alt="image" src="https://github.com/user-attachments/assets/4888c213-42c3-4d12-82e5-9361661ffa46" />
+
 ## Dataset
 
 | Table | Rows |

@@ -140,6 +140,35 @@ together account for 34.5% of all orders, peaking in the late morning hours.
 | Thursday | 453,368 |
 | Friday | 448,761 |
 
+## Design Decisions
+
+### Why staging as views, marts as tables?
+Staging models are materialised as **views** because they are lightweight transformations 
+(renaming columns, casting types) with no aggregation. Views add no storage cost and always 
+reflect the latest source data.
+
+Mart models are materialised as **tables** because they involve heavy joins and aggregations 
+across 33M+ rows. Materialising as tables means downstream queries (BI tools, semantic layer) 
+hit pre-computed results rather than re-running expensive transformations on every query.
+
+### Why combine prior and train order sets in staging?
+The Instacart dataset splits order history into `order_products__prior` and 
+`order_products__train` for ML purposes. For analytical use cases, this split is irrelevant — 
+we need the full order history. Combining them in `stg_order_products` with an `order_set` 
+column preserves the origin while enabling unified analysis downstream.
+
+### Why document NULL basket_size as a warning rather than filtering?
+75,000 orders (~2.2%) have NULL basket_size because they appear in the `orders` table but 
+not in the `order_products` tables — a known characteristic of the Instacart dataset split. 
+Filtering them out would silently remove valid order records. Instead, we document the issue 
+as a dbt test warning so downstream consumers are aware of the limitation.
+
+### Why use customer segments instead of raw order counts?
+Raw order counts are hard to act on. Segments (one_time, occasional, regular, loyal) map 
+directly to business decisions — retention campaigns target occasional customers, loyalty 
+programmes reward loyal ones. Segmentation logic lives in the mart layer so definitions 
+are consistent across all consumers.
+
 ## Tech Stack
 
 - **Python** — data extraction and loading (Kaggle API, pandas, google-cloud-bigquery)

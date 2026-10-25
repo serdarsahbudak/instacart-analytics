@@ -1,0 +1,64 @@
+version: 2
+
+models:
+  - name: dim_products
+    description: "Product dimension table with aisle and department context — Kimball star schema"
+    columns:
+      - name: product_id
+        description: "Primary key for products"
+        data_tests:
+          - unique
+          - not_null
+      - name: product_name
+        description: "Name of the product"
+        data_tests:
+          - not_null
+      - name: aisle
+        description: "Aisle where product is located"
+        data_tests:
+          - not_null
+      - name: department
+        description: "Department where product is located"
+        data_tests:
+          - not_null
+
+  - name: dim_customers
+    description: "Customer dimension table with segmentation and behavioural metrics — Kimball star schema"
+    columns:
+      - name: user_id
+        description: "Primary key for customers"
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_segment
+        description: "Customer segment based on order frequency"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['one_time', 'occasional', 'regular', 'loyal']
+                quote: true
+      - name: total_orders
+        description: "Total number of orders placed by customer"
+        data_tests:
+          - not_null
+
+  - name: fct_order_items
+    description: "Fact table — one row per order item, grain is order_id + product_id — Kimball star schema"
+    columns:
+      - name: order_id
+        description: "Foreign key to orders"
+        data_tests:
+          - not_null
+      - name: product_id
+        description: "Foreign key to dim_products"
+        data_tests:
+          - not_null
+      - name: user_id
+        description: "Foreign key to dim_customers"
+        data_tests:
+          - not_null
+      - name: reordered
+        description: "1 if product has been ordered before, 0 if not"
+        data_tests:
+          - not_null

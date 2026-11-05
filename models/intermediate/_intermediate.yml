@@ -31,7 +31,7 @@ models:
       - name: order_number
         description: "Sequence number of order for this customer"
       - name: order_day_of_week
-        description: "Day of week order was placed (0=Saturday, 6=Friday)"
+        description: "0-6, day of week index (day names not specified by dataset)"
       - name: order_hour_of_day
         description: "Hour of day order was placed"
       - name: days_since_prior_order

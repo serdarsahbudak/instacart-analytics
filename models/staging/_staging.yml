@@ -14,7 +14,7 @@ models:
         data_tests:
           - not_null
       - name: order_day_of_week
-        description: "Day of week order was placed (0=Saturday, 6=Friday)"
+        description: "0-6, day of week index (day names not specified by dataset)"
         data_tests:
           - not_null
           - accepted_values:

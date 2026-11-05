@@ -8,7 +8,7 @@ models:
     agg_time_dimension: order_date
     columns:
       - name: order_date
-        description: "Approximate order date derived from order sequence"
+        description: "Synthetic date derived from order_number (2023-01-01 + order_number days). Required by MetricFlow as a time dimension; not a real order date."
         granularity: day
         dimension:
           type: time

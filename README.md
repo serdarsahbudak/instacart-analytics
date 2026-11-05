@@ -80,9 +80,9 @@ instacart-analytics/
 
 ## Tests
 
-- **34 tests** across staging and marts layers
-- Tests include: `unique`, `not_null`, `accepted_values` (with `quote: false` for integer columns in BigQuery)
-- 2 warnings documented for NULL basket_size — orders present in `orders` table but absent from `order_products` tables, a known characteristic of the Instacart dataset
+- **39 tests** across 14 models (staging, marts, Kimball layer), plus 3 semantic layer metrics
+- Test types: `unique`, `not_null`, `accepted_values` (with `quote: false` for integer columns in BigQuery)
+- 37 pass, 2 warn. The warnings document NULL `basket_size` for orders that exist in `orders` but not in the `order_products` tables, a known characteristic of the Instacart dataset
 
 ## Semantic Layer
 
@@ -100,7 +100,8 @@ dbt sl query --metrics order_count
 dbt sl query --metrics avg_basket_size
 dbt sl query --metrics avg_reorder_rate
 ```
-
+> Note: the dataset has no real order date. `mart_orders.order_date` is a synthetic placeholder (2023-01-01 + `order_number` days) that MetricFlow requires as a time dimension, so metrics should not be interpreted over time.
+> 
 ## CI/CD
 
 GitHub Actions runs `dbt build` on every pull request to main, ensuring all models and tests pass before merging.
@@ -108,11 +109,9 @@ GitHub Actions runs `dbt build` on every pull request to main, ensuring all mode
 ## Business Questions & Findings
 
 ### Which departments have the highest reorder rates?
-Dairy & eggs leads with 50.7% reorder rate, followed by pets (49.5%) and bakery (47.4%). 
-Everyday essentials dominate — customers reorder staples predictably, while produce and frozen 
-categories show lower loyalty despite high order volumes.
+Average of product-level reorder rates per department (simple average, not weighted by order volume).
 
-| Department | Total Orders | Reorder Rate |
+| Department | Products | Avg. Reorder Rate |
 |---|---|---|
 | dairy eggs | 3,449 | 50.7% |
 | pets | 972 | 49.5% |
@@ -120,27 +119,18 @@ categories show lower loyalty despite high order volumes.
 | beverages | 4,364 | 47.3% |
 | breakfast | 1,114 | 46.9% |
 
-### How are customers segmented by loyalty?
-Nearly half of all customers (49.3%) are loyal — placing more than 10 orders. 
-Only 21.1% are occasional shoppers, suggesting strong retention in the platform.
+### How are customers segmented by order frequency?
 
 | Segment | Customers | Share |
 |---|---|---|
-| loyal (10+ orders) | 101,696 | 49.3% |
+| loyal (11+ orders) | 101,696 | 49.3% |
 | regular (6–10 orders) | 60,937 | 29.6% |
 | occasional (2–5 orders) | 43,576 | 21.1% |
 
-### When do customers shop?
-Weekend days drive the highest order volumes — Saturday (600,905) and Sunday (587,478) 
-together account for 34.5% of all orders, peaking in the late morning hours.
+No customer falls into the one_time segment. The dataset likely only includes customers with several prior orders, so the loyal share should not be read as overall platform retention.
 
-| Day | Orders |
-|---|---|
-| Saturday | 600,905 |
-| Sunday | 587,478 |
-| Monday | 467,260 |
-| Thursday | 453,368 |
-| Friday | 448,761 |
+### Which days have the most orders?
+The dataset gives day-of-week as an index (0–6) without naming the days. Day 0 (600,905) and day 1 (587,478) together account for 34.7% of all orders; day 4 is the lowest (426,339).
 
 ## Design Decisions
 
@@ -189,7 +179,7 @@ are consistent across all consumers.
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/sesssass/instacart-analytics.git
+git clone https://github.com/serdarsahbudak/instacart-analytics.git
 cd instacart-analytics
 ```
 
@@ -217,7 +207,7 @@ export GOOGLE_APPLICATION_CREDENTIALS="path/to/credentials.json"
 ### 5. Download and load data
 ```bash
 kaggle datasets download -d psparks/instacart-market-basket-analysis --unzip -p ./data/raw
-python3 extract_load.py
+python3 python/extract_load.py
 ```
 
 ### 6. Run dbt

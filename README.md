@@ -187,7 +187,7 @@ cd instacart-analytics
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-pip install kaggle google-cloud-bigquery pandas pyarrow
+pip install kaggle google-cloud-bigquery pandas pyarrow anthropic
 ```
 
 ### 3. Configure Kaggle API
@@ -198,10 +198,7 @@ chmod 600 ~/.kaggle/kaggle.json
 ```
 
 ### 4. Configure Google Cloud credentials
-Create a service account in Google Cloud Console with BigQuery Admin role,
-download the JSON key and set the environment variable:
-```bash
-export GOOGLE_APPLICATION_CREDENTIALS="path/to/credentials.json"
+Create a service account in Google Cloud Console with the BigQuery Admin role, download the JSON key and save it as `credentials.json` in the project root. The file is git-ignored; never commit it.
 ```
 
 ### 5. Download and load data
@@ -217,6 +214,15 @@ dbt build          # run all models and tests
 dbt sl list metrics  # verify semantic layer
 dbt sl query --metrics order_count  # query a metric
 ```
+### 7. Run the LLM demo (optional)
+Requires an Anthropic API key and the dbt models built in BigQuery (step 6).
+
+```bash
+export ANTHROPIC_API_KEY="your-key-here"
+python3 python/llm_demo.py
+```
+
+The demo lets Claude pick from a small set of vetted SQL queries over the mart layer and answer business questions in plain language. It queries the mart tables directly in BigQuery and does not go through the dbt Semantic Layer.
 
 ### CI/CD
 GitHub Actions automatically runs `dbt build` on every pull request to main.
